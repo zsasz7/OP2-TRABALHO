@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Projeto - Trocador de Calor Bitubular</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A single-page dashboard layout. The structure starts with a high-level summary (Visão Geral), followed by thematic sections for System Configuration, Thermal Analysis, Hydraulic Analysis, and Cost. This non-linear, topic-based structure allows users to quickly grasp the key outcomes and then dive into specific areas of interest. Navigation is handled by a sticky top bar, enabling easy access to any section. An accordion is used for the "Memorial de Cálculo" to provide deep-dive data without cluttering the primary view, enhancing usability. -->
+    <!-- Visualization & Content Choices: 
+        - Project Summary -> Inform -> KPI Cards (HTML/CSS) -> None -> For immediate high-level results.
+        - System Configuration -> Organize -> Diagram (HTML/CSS) -> Hover (planned for future) -> To visually represent the final parallel setup.
+        - Temperature Profile -> Change -> Line Chart (Chart.js) -> Hover Tooltip -> To clearly visualize the counter-current thermal exchange.
+        - Pressure Drop -> Compare -> Bar Chart (Chart.js) -> Hover Tooltip -> To instantly verify that hydraulic constraints are met.
+        - Cost Breakdown -> Proportions -> Doughnut Chart (Chart.js) -> Hover Tooltip -> For an intuitive understanding of cost components.
+        - Detailed Calculation Tables -> Organize -> Accordion (HTML/CSS/JS) -> Click to Expand -> To offer detailed data on demand while maintaining a clean UI.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* bg-gray-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-900">Projeto Trocador de Calor</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#overview" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Visão Geral</a>
+                        <a href="#config" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Configuração</a>
+                        <a href="#analysis" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Análises</a>
+                        <a href="#cost" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Custos</a>
+                        <a href="#details" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Memorial de Cálculo</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Visão Geral Section -->
+        <section id="overview" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Painel de Controle do Projeto</h2>
+            <p class="text-lg text-gray-600 mb-8">Resumo da solução otimizada para resfriamento de óleo cru com água do mar, atendendo a todos os critérios de processo e restrições.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                    <h3 class="text-sm font-medium text-gray-500">Configuração Final</h3>
+                    <p class="mt-1 text-3xl font-semibold text-gray-900">3 Unidades</p>
+                    <p class="text-sm text-gray-600">em paralelo</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                    <h3 class="text-sm font-medium text-gray-500">Grampos por Unidade</h3>
+                    <p class="mt-1 text-3xl font-semibold text-gray-900">3 Grampos</p>
+                    <p class="text-sm text-gray-600">de 20 ft cada</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                    <h3 class="text-sm font-medium text-gray-500">Carga Térmica Total</h3>
+                    <p class="mt-1 text-3xl font-semibold text-gray-900">862,5 kW</p>
+                    <p class="text-sm text-gray-600">de calor trocado</p>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow-md border border-green-200">
+                    <h3 class="text-sm font-medium text-green-700">Custo Total Estimado</h3>
+                    <p class="mt-1 text-3xl font-semibold text-green-800">R$ 34.379</p>
+                    <p class="text-sm text-green-700">Material + Mão de Obra</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuração do Sistema Section -->
+        <section id="config" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Configuração do Sistema</h2>
+            <p class="text-lg text-gray-600 mb-8">Visualização do arranjo final do sistema, com 3 trocadores bitubulares operando em paralelo para dividir a vazão total e atender às restrições de queda de pressão.</p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-200">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                    <!-- Diagrama do Fluxo -->
+                    <div class="flex items-center gap-4 w-full md:w-2/3">
+                        <div class="text-center">
+                            <div class="text-sm font-semibold text-blue-600">Óleo (Quente)</div>
+                            <div class="text-lg font-bold">92.500 lbm/h</div>
+                        </div>
+                        <div class="flex-grow h-1 bg-blue-300 rounded-full relative top-2"></div>
+                        <div class="w-1 h-24 bg-gray-300"></div>
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-12 h-1 bg-blue-300 rounded-full"></div>
+                                <div class="bg-gray-100 border-2 border-gray-300 p-2 rounded-lg text-center text-sm w-48">Unidade 1 <br><span class="font-bold">3 Grampos</span></div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-12 h-1 bg-blue-300 rounded-full"></div>
+                                <div class="bg-gray-100 border-2 border-gray-300 p-2 rounded-lg text-center text-sm w-48">Unidade 2 <br><span class="font-bold">3 Grampos</span></div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-12 h-1 bg-blue-300 rounded-full"></div>
+                                <div class="bg-gray-100 border-2 border-gray-300 p-2 rounded-lg text-center text-sm w-48">Unidade 3 <br><span class="font-bold">3 Grampos</span></div>
+                            </div>
+                        </div>
+                        <div class="w-1 h-24 bg-gray-300"></div>
+                        <div class="flex-grow h-1 bg-red-300 rounded-full relative top-2"></div>
+                         <div class="text-center">
+                            <div class="text-sm font-semibold text-red-600">Óleo (Frio)</div>
+                            <div class="text-lg font-bold">Resfriado</div>
+                        </div>
+                    </div>
+                    <!-- Detalhes da Unidade -->
+                    <div class="w-full md:w-1/3 bg-gray-50 p-6 rounded-lg border">
+                        <h4 class="font-bold text-lg mb-4">Detalhes por Unidade</h4>
+                        <ul class="space-y-3">
+                            <li class="flex justify-between"><span>Comprimento Total:</span> <span class="font-semibold">36,58 m</span></li>
+                            <li class="flex justify-between"><span>Área de Troca:</span> <span class="font-semibold">13,85 m²</span></li>
+                            <li class="flex justify-between"><span>ΔP Óleo:</span> <span class="font-semibold text-green-600">7,85 psi</span></li>
+                            <li class="flex justify-between"><span>ΔP Água:</span> <span class="font-semibold text-green-600">1,75 psi</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Análises Section -->
+        <section id="analysis" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Análises Térmica e Hidráulica</h2>
+            <p class="text-lg text-gray-600 mb-8">Gráficos interativos que demonstram o comportamento térmico do sistema e a conformidade com as restrições de queda de pressão.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Análise Térmica -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                    <h3 class="font-bold text-xl mb-4">Perfil de Temperatura (Contracorrente)</h3>
+                     <div class="chart-container">
+                        <canvas id="temperatureChart"></canvas>
+                    </div>
+                </div>
+                <!-- Análise Hidráulica -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                    <h3 class="font-bold text-xl mb-4">Queda de Pressão vs. Limite</h3>
+                     <div class="chart-container">
+                        <canvas id="pressureDropChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Custos Section -->
+        <section id="cost" class="mb-16 scroll-mt-20">
+             <h2 class="text-3xl font-bold text-gray-900 mb-2">Análise de Custos</h2>
+            <p class="text-lg text-gray-600 mb-8">Detalhamento do custo estimado para a implementação do sistema completo.</p>
+            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                         <h3 class="font-bold text-xl mb-4">Composição do Custo Total</h3>
+                         <div class="space-y-4">
+                             <div class="flex justify-between items-center">
+                                 <span class="text-gray-600">Custo de Material (Aço Inox):</span>
+                                 <span class="font-bold text-lg text-gray-800">R$ 20.402,68</span>
+                             </div>
+                              <div class="flex justify-between items-center">
+                                 <span class="text-gray-600">Custo de Mão de Obra (Fabricação):</span>
+                                 <span class="font-bold text-lg text-gray-800">R$ 13.976,07</span>
+                             </div>
+                             <hr class="my-2">
+                             <div class="flex justify-between items-center">
+                                 <span class="font-bold text-xl text-gray-900">Custo Total:</span>
+                                 <span class="font-bold text-2xl text-green-700">R$ 34.378,75</span>
+                             </div>
+                         </div>
+                    </div>
+                    <div>
+                         <div class="chart-container" style="height: 250px; max-width: 300px;">
+                            <canvas id="costChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Memorial de Cálculo Section -->
+        <section id="details" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Memorial de Cálculo Detalhado</h2>
+            <p class="text-lg text-gray-600 mb-8">Tabelas com os parâmetros de processo, propriedades dos fluidos e resultados detalhados por unidade. Clique para expandir.</p>
+            <div class="space-y-4" id="accordion">
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                    <button class="accordion-header w-full text-left p-4 font-semibold text-lg hover:bg-gray-100 focus:outline-none flex justify-between items-center">
+                        <span>Resultados Detalhados por Unidade</span>
+                        <span class="accordion-icon transform rotate-0 transition-transform duration-300">&#9660;</span>
+                    </button>
+                    <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+                         <div class="p-4 overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parâmetro</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Óleo (Tubo Interno)</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Água (Ânulo)</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unidade</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr class="bg-gray-50"><td colspan="4" class="px-6 py-2 font-bold">Condições de Processo</td></tr>
+                                    <tr><td>Vazão Mássica</td><td>3,88</td><td>4,28</td><td>kg/s</td></tr>
+                                    <tr><td>Temperatura de Entrada</td><td>110,0</td><td>15,6</td><td>°C</td></tr>
+                                    <tr><td>Temperatura de Saída</td><td>93,3</td><td>37,8</td><td>°C</td></tr>
+                                    <tr class="bg-gray-50"><td colspan="4" class="px-6 py-2 font-bold">Propriedades do Fluido (T média)</td></tr>
+                                    <tr><td>Massa Específica (ρ)</td><td>835,0</td><td>1023,0</td><td>kg/m³</td></tr>
+                                    <tr><td>Calor Específico (cp)</td><td>2210</td><td>3990</td><td>J/kg·K</td></tr>
+                                    <tr><td>Condutividade Térmica (k)</td><td>0,135</td><td>0,612</td><td>W/m·K</td></tr>
+                                    <tr><td>Viscosidade (μ)</td><td>0,0152</td><td>0,00086</td><td>Pa·s</td></tr>
+                                    <tr class="bg-gray-50"><td colspan="4" class="px-6 py-2 font-bold">Parâmetros de Escoamento</td></tr>
+                                    <tr><td>Diâmetro Hidráulico (Dh)</td><td>0,0525</td><td>0,0221</td><td>m</td></tr>
+                                    <tr><td>Fluxo Mássico (G)</td><td>1790</td><td>1705</td><td>kg/m²·s</td></tr>
+                                    <tr><td>Número de Reynolds (Re)</td><td>3.190</td><td>16.350</td><td>-</td></tr>
+                                    <tr class="bg-gray-50"><td colspan="4" class="px-6 py-2 font-bold">Parâmetros de Transf. de Calor</td></tr>
+                                    <tr><td>Número de Prandtl (Pr)</td><td>277,3</td><td>5,6</td><td>-</td></tr>
+                                    <tr><td>Número de Nusselt (Nu)</td><td>78,5</td><td>111,8</td><td>-</td></tr>
+                                    <tr><td>Coeficiente de Película (h)</td><td>175,9</td><td>1777,6</td><td>W/m²·K</td></tr>
+                                    <tr class="bg-gray-50"><td colspan="4" class="px-6 py-2 font-bold">Queda de Pressão</td></tr>
+                                    <tr><td>Fator de Atrito (f)</td><td>0,0432</td><td>0,0284</td><td>-</td></tr>
+                                    <tr><td>ΔP Distribuída</td><td>7,10</td><td>1,73</td><td>psi</td></tr>
+                                    <tr><td>ΔP Localizada</td><td>0,75</td><td>0,02</td><td>psi</td></tr>
+                                    <tr class="bg-blue-50"><td class="font-bold">ΔP Total</td><td class="font-bold">7,85</td><td class="font-bold">1,75</td><td class="font-bold">psi</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-white border-t border-gray-200 mt-16">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p>&copy; 2025 Gemini Engenharia. Relatório de Projeto Interativo.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const projectData = {
+                temperatures: {
+                    labels: ['Entrada Trocador', 'Saída Trocador'],
+                    oil: [110.0, 93.3],
+                    water: [15.6, 37.8]
+                },
+                pressureDrop: {
+                    labels: ['Óleo (Tubo)', 'Água (Ânulo)'],
+                    actual: [7.85, 1.75],
+                    limit: [8.0, 15.0]
+                },
+                cost: {
+                    labels: ['Material', 'Mão de Obra'],
+                    values: [20402.68, 13976.07]
+                }
+            };
+
+            const createTemperatureChart = () => {
+                const ctx = document.getElementById('temperatureChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: projectData.temperatures.labels,
+                        datasets: [
+                            {
+                                label: 'Óleo (Quente)',
+                                data: projectData.temperatures.oil,
+                                borderColor: 'rgba(239, 68, 68, 1)', // red-500
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                tension: 0.1,
+                                fill: false
+                            },
+                            {
+                                label: 'Água (Fria)',
+                                data: projectData.temperatures.water,
+                                borderColor: 'rgba(59, 130, 246, 1)', // blue-500
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.1,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: { display: true, text: 'Temperatura (°C)' }
+                            }
+                        },
+                        plugins: {
+                            title: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            }
+                        }
+                    }
+                });
+            };
+
+            const createPressureDropChart = () => {
+                const ctx = document.getElementById('pressureDropChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: projectData.pressureDrop.labels,
+                        datasets: [
+                            {
+                                label: 'ΔP Calculado',
+                                data: projectData.pressureDrop.actual,
+                                backgroundColor: 'rgba(34, 197, 94, 1)', // green-500
+                                borderColor: 'rgba(22, 163, 74, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'ΔP Limite',
+                                data: projectData.pressureDrop.limit,
+                                backgroundColor: 'rgba(239, 68, 68, 1)', // red-500
+                                borderColor: 'rgba(220, 38, 38, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Queda de Pressão (psi)' }
+                            }
+                        },
+                         plugins: {
+                            title: { display: false },
+                        }
+                    }
+                });
+            };
+            
+            const createCostChart = () => {
+                const ctx = document.getElementById('costChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: projectData.cost.labels,
+                        datasets: [{
+                            label: 'Custo',
+                            data: projectData.cost.values,
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)', // blue-500
+                                'rgba(249, 115, 22, 0.8)'  // orange-500
+                            ],
+                            borderColor: [
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(249, 115, 22, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                           legend: {
+                               position: 'top',
+                           },
+                           title: {
+                               display: false
+                           }
+                        }
+                    }
+                });
+            };
+
+            const setupAccordion = () => {
+                const accordion = document.getElementById('accordion');
+                const headers = accordion.getElementsByClassName('accordion-header');
+
+                for (let header of headers) {
+                    header.addEventListener('click', function() {
+                        const content = this.nextElementSibling;
+                        const icon = this.querySelector('.accordion-icon');
+
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
+                            icon.style.transform = 'rotate(0deg)';
+                        } else {
+                            content.style.maxHeight = content.scrollHeight + "px";
+                            icon.style.transform = 'rotate(180deg)';
+                        }
+                    });
+                }
+            };
+
+            createTemperatureChart();
+            createPressureDropChart();
+            createCostChart();
+            setupAccordion();
+        });
+    </script>
+
+</body>
+</html>
